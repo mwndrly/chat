@@ -91,7 +91,14 @@
   </div>
 
   <script>
-   const socket = io("https://cachectic-suably-brigette.ngrok-free.dev");
+    const socket = io("https://cachectic-suably-brigette.ngrok-free.dev", {
+    path: "/socket.io/",       // casa com o path do servidor
+    transports: ["websocket"], // pula o polling
+    withCredentials: false
+  });
+
+    socket.on("connect", () => console.log("conectado:", socket.id));
+    socket.on("connect_error", (e) => console.log("connect_error:", e.message));
 
     const chat = document.getElementById("chat");
     const msgInput = document.getElementById("msg");
