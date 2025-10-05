@@ -1,18 +1,36 @@
+import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import cors from "cors";
 
-const server = http.createServer();
+const app = express();
+
+// Libera CORS para qualquer origem (GitHub Pages, ngrok, etc)
+app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
+
+// Cria o servidor HTTP
+const server = http.createServer(app);
+
+// Configura o Socket.io com CORS liberado
 const io = new Server(server, {
-  cors: { origin: "*" } // permite conexões de qualquer origem
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
 });
 
+// Rota simples só pra testar se o servidor responde
+app.get("/", (req, res) => {
+  res.send("Servidor Socket.io está rodando ✅");
+});
+
+// Lida com conexões WebSocket
 io.on("connection", (socket) => {
   console.log(`Cliente conectado: ${socket.id}`);
 
   socket.on("chat message", (msg) => {
-    // msg = { user, text }
     console.log(`${msg.user}: ${msg.text}`);
-    io.emit("chat message", msg); // reenvia para todos os clientes
+    io.emit("chat message", msg);
   });
 
   socket.on("disconnect", () => {
@@ -20,6 +38,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// Inicia o servidor
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
