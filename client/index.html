@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Distribuído</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+      color: #38bdf8;
+    }
+    #chat {
+      flex: 1;
+      width: 90%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .msg {
+      padding: 8px 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    .me {
+      background: #0ea5e9;
+      color: #fff;
+      align-self: flex-end;
+    }
+    .other {
+      background: #334155;
+      color: #e2e8f0;
+      align-self: flex-start;
+    }
+    #input-area {
+      display: flex;
+      width: 90%;
+      max-width: 500px;
+      margin-bottom: 20px;
+    }
+    #msg {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+      background: #334155;
+      color: #e2e8f0;
+    }
+    #send {
+      padding: 10px 20px;
+      background: #0ea5e9;
+      border: none;
+      color: #fff;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #send:hover {
+      background: #0284c7;
+    }
+  </style>
+</head>
+<body>
+  <h1>💬 Chat Distribuído</h1>
+
+  <div id="chat"></div>
+
+  <div id="input-area">
+    <input id="msg" type="text" placeholder="Digite sua mensagem..." autocomplete="off" />
+    <button id="send">Enviar</button>
+  </div>
+
+  <script>
+   const socket = io("http://localhost:3000");
+
+    const chat = document.getElementById("chat");
+    const msgInput = document.getElementById("msg");
+    const sendBtn = document.getElementById("send");
+
+    let username = prompt("Digite seu nome:");
+    if (!username) username = "Anônimo";
+
+    sendBtn.addEventListener("click", sendMessage);
+    msgInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+    const text = msgInput.value.trim();
+    if (!text) return;
+    socket.emit("chat message", { user: username, text });
+    msgInput.value = "";
+    }
+
+    socket.on("chat message", (msg) => {
+    const div = document.createElement("div");
+    div.classList.add("msg");
+    div.classList.add(msg.user === username ? "me" : "other");
+    div.innerHTML = `<strong>${msg.user}:</strong> ${msg.text}`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    });
+  </script>
+</body>
+</html>
