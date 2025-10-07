@@ -133,11 +133,3 @@ server.listen(3000, () => console.log("Servidor rodando em http://localhost:3000
 
 Este projeto é distribuído sob a licença **MIT**.  
 Sinta-se à vontade para usar, modificar e distribuir.
-
----
-
-## 👩‍💻 Autor
-
-**Seu Nome Aqui**  
-📧 Email: seuemail@exemplo.com  
-🌐 GitHub: [@seuusuario](https://github.com/seuusuario)
